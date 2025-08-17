@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ml-autoscaler
+  namespace: thesis
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ml-autoscaler-read-deploy
+  namespace: thesis
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"]   
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ml-autoscaler-read-deploy
+  namespace: thesis
+subjects:
+- kind: ServiceAccount
+  name: ml-autoscaler
+  namespace: thesis
+roleRef:
+  kind: Role
+  name: ml-autoscaler-read-deploy
+  apiGroup: rbac.authorization.k8s.io
+

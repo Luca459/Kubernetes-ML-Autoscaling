@@ -1,0 +1,23 @@
+---
+extraArgs:
+  - --enable-external-metrics=true
+  - --logtostderr=true
+  - --v=4
+
+prometheus:
+  url: http://prometheus-operated.monitoring.svc
+  port: 9090
+
+rules:
+  default: false 
+  custom:
+    - seriesQuery: >
+        custom_autoscaler_desired_replicas{namespace!="",deployment!=""}
+      resources:
+        overrides:
+          namespace: { resource: "namespace" }
+          deployment: { group: "apps", resource: "deployments" }
+      name:
+        as: custom_autoscaler_desired_replicas
+      metricsQuery: |
+        custom_autoscaler_desired_replicas{<<.LabelMatchers>>}

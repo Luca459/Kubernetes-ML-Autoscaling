@@ -1,0 +1,29 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cpu-mem-demo-ml
+  namespace: thesis
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cpu-mem-demo
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Object
+    object:
+      describedObject:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: cpu-mem-demo
+      metric:
+        name: custom_autoscaler_desired_replicas
+      target:
+        type: Value        
+        value: "1"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30
+    scaleUp:
+      stabilizationWindowSeconds: 0
