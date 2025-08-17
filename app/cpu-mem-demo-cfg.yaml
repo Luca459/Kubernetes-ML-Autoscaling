@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cpu-mem-demo-cfg
+  namespace: thesis
+data:
+  CPU_MS: "35"
+  MEM_MB: "8"

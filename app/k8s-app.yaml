@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-mem-demo
+  namespace: thesis
+spec:
+  replicas: 1
+  
+  minReadySeconds: 80
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels: { app: cpu-mem-demo }
+  template:
+    metadata:
+      labels: { app: cpu-mem-demo }
+    spec:
+      containers:
+        - name: api
+          image: luca459/thesis:0.5
+          envFrom:
+            - configMapRef:
+                name: cpu-mem-demo-cfg
+          ports:
+            - containerPort: 8000
+          resources:
+            requests: { cpu: "300m", memory: "500Mi" }
+            limits: { cpu: "1500m", memory: "1800Mi" }
+
+        
+          startupProbe:
+            httpGet:
+              path: /metrics
+              port: 8000
+            periodSeconds: 2
+            failureThreshold: 60
+
+        
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 80 
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 1
+
+     
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 1

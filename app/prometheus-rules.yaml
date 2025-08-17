@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cpu-mem-demo-recording
+  labels:
+    prometheus: kube-prom
+spec:
+  groups:
+  - name: cpu-mem-demo.rules
+    interval: 30s
+    rules:
+    - record: app:cpu_cores
+      expr: avg(rate(container_cpu_usage_seconds_total{pod=~"cpu-mem-demo.*"}[1m]))
+    - record: app:cpu_cores_total
+      expr: sum(rate(container_cpu_usage_seconds_total{pod=~"cpu-mem-demo.*"}[1m]))
+    - record: app:mem_workingset_mib
+      expr: avg(container_memory_working_set_bytes{pod=~"cpu-mem-demo.*"}) / 1024/1024
+    - record: app:reqs_per_sec
+      expr: rate(http_requests_total{job="app"}[1m])
+    - record: app:rx_bytes_per_sec
+      expr: sum(rate(container_network_receive_bytes_total{pod=~"cpu-mem-demo.*"}[1m]))
+    - record: app:latency_p90_ms
+      expr: histogram_quantile(0.90, sum by(le)(rate(http_request_duration_seconds_bucket{job="app"}[1m]))) * 1000
+    - record: app:latency_p99_ms
+      expr: histogram_quantile(0.99, sum by(le)(rate(http_request_duration_seconds_bucket{job="app"}[1m]))) * 1000
+

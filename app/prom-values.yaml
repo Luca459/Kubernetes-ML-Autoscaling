@@ -1,0 +1,35 @@
+grafana:
+  enabled: false
+
+alertmanager:
+  enabled: false
+
+defaultRules:
+  create: false
+
+kube-state-metrics:
+  enabled: true
+
+prometheus-node-exporter:
+  enabled: true
+
+prometheus:
+  service:
+    type: ClusterIP
+  prometheusSpec:
+    retention: 3d
+    scrapeInterval: 15s
+    evaluationInterval: 30s
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    externalLabels:
+      cluster: thesis-baseline
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3 
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
